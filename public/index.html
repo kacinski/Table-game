@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Table game</title>
+  <style>
+    table,
+    td {
+      /*//border: 1px solid #333;*/
+    }
+
+    td {
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+    }
+
+    thead {
+      background-color: #333;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Table game</h1>
+
+  <form>
+    <select id="colors">
+      <option disabled selected value="1">Choose color:</option>
+              <option>Red</option>
+              <option value="black">Black</option>
+              <option value="green">Green</option>
+              <option value="yellow">Yellow</option>
+          </select>
+
+  </form>
+
+  <script>
+    (function () {
+      const ws = new WebSocket(`wss://${location.host}`);
+      ws.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        let selector = data.map(el => "tr td[data-index='" + el + "']").join(",");
+        var a = document.querySelectorAll(selector);
+        let x = document.getElementById("colors").value;
+        // [...a].forEach(el => {
+        //   if (el.style.backgroundColor != "red") {
+        //     el.style.backgroundColor = "blue";
+        //   }
+        // })
+      };
+
+
+      function onClick(e) {
+        let arr = [];
+
+        if (!e.target.textContent &&
+          e.target.parentNode.nodeName == "TR" &&
+          !e.target.style.backgroundColor) {
+          let index = e.target.getAttribute('data-index');
+          ws.send(+index);
+          let yourColor = document.getElementById("colors").value;
+          arr.push(index);
+
+          if (yourColor != "1") {
+
+            e.target.style.backgroundColor = yourColor;
+            console.log(index);
+
+          }
+          else {
+            alert("Choose color, please!");
+          }
+        }
+      }
+
+
+
+
+
+      drawTable = () => {
+
+        let board = [];
+        let array = [];
+        for (i = 0; i < 50; i++) {
+          array[i] = []
+          for (j = 0; j < 50; j++)
+            array[i].push(''); // Creating a data array which a loop will source from
+        }
+        var table = document.createElement('table');
+        document.body.appendChild(table); // Drew the main table node on the document
+
+        for (var i = 0; i < array.length; i++) {
+          let tr = document.createElement('tr'); //Create 3 <tr> elements assigned to a unique variable BUT need a working alternative for 'tr[i]'
+          table.appendChild(tr); // Append to <table> node
+
+          for (var j = 0; j < array[i].length; j++) {
+
+            var tdText = document.createElement('td');
+            tdText.textContent = (array[i][j]);
+            board.push(tdText)
+            tdText.onclick = onClick
+            tdText.setAttribute('data-index', i * array[i].length + (j + 1));
+
+            tr.appendChild(tdText); // Take string from placeholder variable and append it to <tr> node
+          }
+        }
+      }
+      drawTable();
+
+
+    })();
+  </script>
+</body>
+
+</html>
