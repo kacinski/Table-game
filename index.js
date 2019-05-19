@@ -8,26 +8,27 @@ const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
 
 const server = createServer(app);
-const wss = new WebSocket.Server({ server });
+const ws = new WebSocket.Server({ server });
 
 const clients = {
 
-}
+};
 
 
 function sendToAll(data) {
   Object.keys(clients).forEach(id => {
-    clients[id].send(JSON.stringify(data))
+    clients[id].send(JSON.stringify(data));
+
   })
 }
 
 const table = [];
 
-wss.on('connection', function (ws) {
+ws.on('connection', function (ws) {
   ws.id = uuid();
 
-  clients[ws.id] = ws;
 
+  clients[ws.id] = ws;
 
 
   ws.send(JSON.stringify(table));
@@ -46,6 +47,6 @@ wss.on('connection', function (ws) {
   });
 });
 
-server.listen(8080, function () {
-  console.log('Listening on http://localhost:8080');
+server.listen(8282, function () {
+  console.log('Listening on http://localhost:8282');
 });
